@@ -13,4 +13,5 @@
     <string name="ad_nfcTurnOn_message">You need turn on NFC module for scanning. Wish turn on it now?</string>
     <string name="ad_nfcTurnOn_pos">Turn on</string>
     <string name="ad_nfcTurnOn_neg">Dismiss</string>
+    <string name="initial_status_nfc">Waiting for NFC</string>
 </resources>

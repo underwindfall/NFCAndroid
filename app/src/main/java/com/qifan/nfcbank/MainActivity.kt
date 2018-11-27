@@ -8,10 +8,14 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.widget.TextView
 import com.pro100svitlo.creditCardNfcReader.utils.CardNfcUtils
-import kotlinx.android.synthetic.main.activity_main.*
+import android.view.View
+import android.widget.ImageView
+import android.widget.ProgressBar
+import com.qifan.nfcbank.extensions.formattedCardNumber
+import com.qifan.nfcbank.extensions.longShowSnackBar
+import android.widget.LinearLayout
 
 
 class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface {
@@ -23,20 +27,26 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
     private lateinit var mPendingIntent: PendingIntent
 
     //    private lateinit var mToolbar: Toolbar
-    private lateinit var mTextView: TextView
+    private lateinit var mNFCStatusTextView: TextView
+    private lateinit var mCardNumber: TextView
+    private lateinit var mCardHolderName: TextView
+    private lateinit var mCardExpirationDate: TextView
+    private lateinit var mCardType: ImageView
     private lateinit var mTurnNfcDialog: AlertDialog
+    private lateinit var mProgressBar: ProgressBar
+    private lateinit var mCardContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        mToolbar = findViewById<Toolbar>(R.id.toolbar)
-//        setSupportActionBar(mToolbar)
-        mTextView = findViewById(R.id.tv_result_nfc)
+        mNFCStatusTextView = findViewById(R.id.tv_result_nfc)
+        mCardNumber = findViewById(R.id.tv_cardNumber)
+        mCardHolderName = findViewById(R.id.tv_cardHolderName)
+        mCardExpirationDate = findViewById(R.id.tv_cardExpirationDate)
+        mCardType = findViewById(R.id.iv_cardType)
+        mCardContainer = findViewById(R.id.ll_cardContainer)
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this)
-//        mPendingIntent = PendingIntent.getActivity(
-//            this, 0,
-//            Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0
-//        )
+        createProgressbar()
         if (checkNFCEnable()) {
             mCardNfcUtils = CardNfcUtils(this)
             mIntentFromCreate = true
@@ -45,6 +55,11 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
             showTurnOnNfcDialog()
         }
 
+    }
+
+    private fun createProgressbar() {
+        mProgressBar = ProgressBar(this)
+        mProgressBar.isIndeterminate = true
     }
 
 
@@ -97,7 +112,7 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
                 // Process the messages array.
                 messages.forEach { message ->
                     message.records.forEach { record ->
-                        mTextView.text = TextRecord.parse(record).text
+                        mNFCStatusTextView.text = TextRecord.parse(record).text
                     }
                 }
             }
@@ -127,40 +142,58 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
 
     private fun checkNFCEnable(): Boolean {
         return if (mNfcAdapter == null) {
+            mNFCStatusTextView.text = getString(R.string.tv_noNfc)
             false
         } else {
             mNfcAdapter!!.isEnabled
         }
     }
 
+    private fun parseCardType(cardType: String?) {
+        when (cardType) {
+            MyCardNfcAsyncTask.CARD_UNKNOWN -> longShowSnackBar(
+                mNFCStatusTextView,
+                getString(R.string.snack_unknown_bank_card)
+            )
+            MyCardNfcAsyncTask.CARD_VISA -> mCardType.setImageResource(R.drawable.visa_logo)
+            MyCardNfcAsyncTask.CARD_MASTER_CARD -> mCardType.setImageResource(R.drawable.master_logo)
+        }
+    }
 
     override fun startNfcReadCard() {
-
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun cardIsReadyToRead() {
-        Log.d(
-            "NFCBANK",
-            "cardNumber is ===============" + mCardNfcAsyncTask?.cardNumber +
-                    "expirationDate" + mCardNfcAsyncTask?.cardExpireDate
-        )
-        mTextView.text = mCardNfcAsyncTask?.cardNumber
+        mNFCStatusTextView.visibility = View.GONE
+        mProgressBar.visibility = View.GONE
+        mCardContainer.visibility = View.VISIBLE
+        val cardNumber = formattedCardNumber(mCardNfcAsyncTask?.cardNumber)
+        val expirationDate = mCardNfcAsyncTask?.cardExpireDate
+        val holderName = mCardNfcAsyncTask?.cardHolderFirstName + mCardNfcAsyncTask?.cardHolderLastName
+        val cardType = mCardNfcAsyncTask?.cardType
+        mCardNumber.text = cardNumber
+        mCardExpirationDate.text = expirationDate
+        mCardHolderName.text = holderName
+        parseCardType(cardType)
     }
+
 
     override fun finishNfcReadCard() {
         mCardNfcAsyncTask = null
     }
 
     override fun cardWithLockedNfc() {
-
+        longShowSnackBar(mNFCStatusTextView, getString(R.string.snack_lockedNfcCard))
     }
 
     override fun doNotMoveCardSoFast() {
-
+        longShowSnackBar(mNFCStatusTextView, getString(R.string.snack_doNotMoveCard))
     }
 
     override fun unknownEmvCard() {
-
+        longShowSnackBar(mNFCStatusTextView, getString(R.string.snack_unknownEmv))
     }
+
 
 }

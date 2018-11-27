@@ -99,6 +99,8 @@ public class MyCardNfcAsyncTask extends AsyncTask<Void, Void, Object> {
     private String mCardNumber;
     private String mExpireDate;
     private String mCardType;
+    private String mCardHolderFirstName;
+    private String mCardHolderLastName;
 
     private MyCardNfcAsyncTask(Builder b) {
         mTag = b.mTag;
@@ -132,6 +134,14 @@ public class MyCardNfcAsyncTask extends AsyncTask<Void, Void, Object> {
         return mCardType;
     }
 
+    public String getCardHolderFirstName() {
+        return mCardHolderFirstName;
+    }
+
+    public String getCardHolderLastName() {
+        return mCardHolderLastName;
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -161,6 +171,8 @@ public class MyCardNfcAsyncTask extends AsyncTask<Void, Void, Object> {
                     mCardNumber = mCard.getCardNumber();
                     mExpireDate = mCard.getExpireDate();
                     mCardType = mCard.getType().toString();
+                    mCardHolderFirstName = mCard.getHolderFirstname();
+                    mCardHolderLastName = mCard.getHolderLastname();
                     if (mCardType.equals(EmvCardScheme.UNKNOWN.toString())) {
                         Log.d("creditCardNfcReader", UNKNOWN_CARD_MESS);
                     }

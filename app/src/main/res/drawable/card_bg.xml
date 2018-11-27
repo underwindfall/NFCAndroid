@@ -6,11 +6,11 @@
     />
     <stroke
             android:width="2dp"
-            android:color="@color/colorPrimaryDark"
+            android:color="#143F64"
     />
     <gradient
-            android:startColor="@color/colorPrimary"
-            android:endColor="@color/colorPrimaryDark"
+            android:startColor="#143F64"
+            android:endColor="#143F64"
             android:type="linear"
             android:angle="90"
     />
