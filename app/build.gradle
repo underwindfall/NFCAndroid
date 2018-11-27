@@ -27,6 +27,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation Libs.support_appcompat_v7
     implementation Libs.support_constraint_layout
+    implementation Libs.support_design
+    implementation Libs.nfc_emv_lib
     testImplementation Libs.junit
     androidTestImplementation Libs.test_runner
     androidTestImplementation Libs.espresso_core
