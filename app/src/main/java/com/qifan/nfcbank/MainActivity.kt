@@ -1,5 +1,6 @@
 package com.qifan.nfcbank
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NdefMessage
@@ -7,6 +8,7 @@ import android.nfc.NfcAdapter
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.RequiresPermission
 import android.support.v7.app.AlertDialog
 import android.widget.TextView
 import com.pro100svitlo.creditCardNfcReader.utils.CardNfcUtils
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
         mCardType = findViewById(R.id.iv_cardType)
         mCardContainer = findViewById(R.id.ll_cardContainer)
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this)
+
         createProgressbar()
         if (checkNFCEnable()) {
             mCardNfcUtils = CardNfcUtils(this)
@@ -138,7 +141,6 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
             .create()
         mTurnNfcDialog.show()
     }
-
 
     private fun checkNFCEnable(): Boolean {
         return if (mNfcAdapter == null) {

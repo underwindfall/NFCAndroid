@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="com.qifan.nfcbank">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.qifan.nfcbank">
 
     <uses-permission android:name="android.permission.NFC"/>
-    <uses-feature android:name="android.hardware.nfc" android:required="true"/>
+
+    <uses-feature
+            android:name="android.hardware.nfc"
+            android:required="true"/>
 
     <application
             android:allowBackup="true"
@@ -13,23 +17,31 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-
-
-        <activity android:name=".MainActivity"
-                  android:screenOrientation="portrait"
-                  android:launchMode="singleTop">
+        <activity
+                android:name=".MainActivity"
+                android:launchMode="singleTop"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
+
                 <data android:mimeType="text/plain"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".NFCSendActivity">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
 
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="application/com.qifan.nfcbank"/>
+            </intent-filter>
         </activity>
     </application>
 
