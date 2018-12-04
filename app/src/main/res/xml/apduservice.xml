@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+                   android:description="@string/servicedesc" android:requireDeviceUnlock="false">
+
+    <aid-group android:description="@string/aiddescription"  android:category="other" >
+        <aid-filter android:name="D2760000850101"/>
+        <!-- GlobalPlatform -->
+        <!--<aid-filter android:name="FF00000151000001"/>-->
+        <!--&lt;!&ndash; ISO 7816 Applet &ndash;&gt;-->
+        <!--<aid-filter android:name="F276A288BCFBA69D34F31001"/>-->
+        <!--&lt;!&ndash; Joost Applet &ndash;&gt;-->
+        <!--<aid-filter android:name="01020304050601"/>-->
+        <!--&lt;!&ndash; HelloApplet &ndash;&gt;-->
+        <!--<aid-filter android:name="D2760001180002FF49502589C0019B01"/>-->
+        <!--<aid-filter android:name="F0394148148100" />-->
+    </aid-group>
+    <!-- END_INCLUDE(CardEmulationXML) -->
+</host-apdu-service>

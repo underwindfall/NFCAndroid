@@ -4,7 +4,8 @@
           package="com.qifan.nfcbank">
 
     <uses-permission android:name="android.permission.NFC"/>
-
+    <uses-feature android:name="android.hardware.nfc.hce"
+                  android:required="true"/>
     <uses-feature
             android:name="android.hardware.nfc"
             android:required="true"/>
@@ -17,15 +18,18 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity
-                android:name=".MainActivity"
-                android:launchMode="singleTop"
-                android:screenOrientation="portrait">
+        <activity android:name=".cardEmulatorActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+       <!-- <activity
+                android:name=".MainActivity"
+                android:launchMode="singleTop"
+                android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
 
@@ -43,6 +47,32 @@
                 <data android:mimeType="application/com.qifan.nfcbank"/>
             </intent-filter>
         </activity>
+-->
+        <!--<service
+                android:name=".cardEmulation.MyHostApduService"
+                android:exported="true"
+                android:permission="android.permission.BIND_NFC_SERVICE" >
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.OFF_HOST_APDU_SERVICE"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.cardemulation.off_host_apdu_service"
+                       android:resource="@xml/apduservice"/>
+        </service>-->
+        <service android:name=".cardEmulation.MyHostApduService"
+                 android:exported="true"
+                 android:enabled="true"
+                 android:permission="android.permission.BIND_NFC_SERVICE">
+
+            <!-- Intent filter indicating that we support card emulation. -->
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <!-- Required XML configuration file, listing the AIDs that we are emulating cards
+                 for. This defines what protocols our card emulation service supports. -->
+            <meta-data android:name="android.nfc.cardemulation.host_apdu_service"
+                       android:resource="@xml/apduservice"/>
+        </service>
     </application>
 
 </manifest>

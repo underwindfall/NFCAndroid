@@ -14,4 +14,6 @@
     <string name="ad_nfcTurnOn_pos">Turn on</string>
     <string name="ad_nfcTurnOn_neg">Dismiss</string>
     <string name="initial_status_nfc">Waiting for NFC</string>
+    <string name="aiddescription">aiddescription</string>
+    <string name="servicedesc">servicedesc</string>
 </resources>
