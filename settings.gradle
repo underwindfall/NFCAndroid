@@ -1,1 +1,1 @@
-include ':app', ':readnfcmessage'
+include ':app', ':readnfcmessage', ':nfcemvread'

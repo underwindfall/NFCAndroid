@@ -1,22 +1,14 @@
 <resources>
     <string name="app_name">NFCBank</string>
-    <string name="repoUrl">https://github.com/pro100svitlo/Credit-Card-NFC-Reader#questions-and-help</string>
-    <string name="tv_noNfc">There is no NFC module on this device</string>
-    <string name="tv_tapYourCard">Please put your card to back panel of the phone</string>
-    <string name="ad_progressBar_title">Scanning …</string>
-    <string name="ad_progressBar_mess">Please do not remove or move card during reading.</string>
-    <string name="snack_unknown_bank_card">This is unknown bank card. Please, go to my github repo!</string>
-    <string name="snack_doNotMoveCard">Please do not move card, try again !</string>
-    <string name="snack_unknownEmv">Unknown EMV card</string>
-    <string name="snack_lockedNfcCard">NFC is locked on this card.</string>
-    <string name="ad_nfcTurnOn_title">NFC is turned off.</string>
-    <string name="ad_nfcTurnOn_message">You need turn on NFC module for scanning. Wish turn on it now?</string>
     <string name="ad_nfcTurnOn_pos">Turn on</string>
     <string name="ad_nfcTurnOn_neg">Dismiss</string>
     <string name="initial_status_nfc">Waiting for NFC</string>
-    <string name="aiddescription">aiddescription</string>
-    <string name="servicedesc">servicedesc</string>
     <string name="confirm">Confirm</string>
     <string name="edit_text_hint">Input whatever your want</string>
     <string name="toast_msg">please write something in editText</string>
+    <string name="servicedesc">servicedesc</string>
+    <string name="aiddescription">aiddescription</string>
+    <string name="ad_nfcTurnOn_title">NFC is turned off.</string>
+    <string name="ad_nfcTurnOn_message">You need turn on NFC module for scanning. Wish turn on it now?</string>
+    <string name="tv_noNfc">There is no NFC module on this device</string>
 </resources>
