@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ReadNFCMessage</string>
+    <string name="tv_noNfc">There is no nfc can be used</string>
 </resources>
