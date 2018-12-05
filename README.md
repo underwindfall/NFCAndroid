@@ -7,13 +7,11 @@ which simulate the whole process command talking cross devices. You can find mor
 ## Architecture
 The whole project conclude 3 projects modules globally.
 
-        |       Module      |                           Status                         |
-        |:-----------------:|:--------------------------------------------------------:|
-        |      app          |    Android Host Card Emulation of a NFC Forum Type-4 tag |
-        |  readNfcMessage   |    NFC Read Application to verify HCE Android Completion |
-        |    nfcemvread     |    NFC Read Application to get Card Bank Information     |
-
-
+| Module     | Status      |
+|:--------------|:-----------:|
+| app     | Android Host Card Emulation of a NFC Forum Type-4 tag  |
+| readNfcMessage      | NFC Read Application to verify HCE Android Completion   |
+| nfcemvread   | NFC Read Application to get Card Bank Information          |
 
 ## ScreenShots
 
@@ -22,9 +20,9 @@ The whole project conclude 3 projects modules globally.
 
 - read NFC Message Application
     - Android
-    - <img src="art/3.png" width="200px" /><img src="art/3.png" width="200px" />
+    <img src="art/3.png" width="200px" /><img src="art/3.png" width="200px" />
     - iOS
-    - <img src="https://github.com/underwindfall/NFCReaderiOS/blob/master/art/image1.png" width="200px" /><img src="art/3.png" width="200px" /><img src="https://github.com/underwindfall/NFCReaderiOS/blob/master/art/image2.png" width="200px" /><img src="art/3.png" width="200px" />
+    <img src="https://github.com/underwindfall/NFCReaderiOS/blob/master/art/image1.png" width="200px" /><img src="https://github.com/underwindfall/NFCReaderiOS/blob/master/art/image2.png" width="200px" />
 
 - nfc read card bank info (EMV)
     -  <img src="art/1.png" width="200px" /><img src="art/2.png" width="200px" />
