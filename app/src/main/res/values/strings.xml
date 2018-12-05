@@ -16,4 +16,7 @@
     <string name="initial_status_nfc">Waiting for NFC</string>
     <string name="aiddescription">aiddescription</string>
     <string name="servicedesc">servicedesc</string>
+    <string name="confirm">Confirm</string>
+    <string name="edit_text_hint">Input whatever your want</string>
+    <string name="toast_msg">please write something in editText</string>
 </resources>

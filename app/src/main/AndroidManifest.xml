@@ -18,7 +18,7 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".cardEmulatorActivity">
+        <activity android:name=".CardEmulatorActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -58,7 +58,7 @@
             <meta-data android:name="android.nfc.cardemulation.off_host_apdu_service"
                        android:resource="@xml/apduservice"/>
         </service>-->
-        <service android:name=".cardEmulation.MyHostApduService"
+        <service android:name=".cardEmulation.KHostApduService"
                  android:exported="true"
                  android:enabled="true"
                  android:permission="android.permission.BIND_NFC_SERVICE">

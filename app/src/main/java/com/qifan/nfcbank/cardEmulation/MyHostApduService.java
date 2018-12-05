@@ -124,8 +124,8 @@ public class MyHostApduService extends HostApduService {
                     NDEF_ID,
                     intent.getStringExtra("ndefMessage").getBytes(Charset.forName("UTF-8"))
             );
-
-            NDEF_URI_BYTES = NDEF_URI.toByteArray();
+            NdefMessage ndefMessage = new NdefMessage(NDEF_URI);
+            NDEF_URI_BYTES = ndefMessage.toByteArray();
             NDEF_URI_LEN = BigInteger.valueOf(NDEF_URI_BYTES.length).toByteArray();
 
             Context context = getApplicationContext();
@@ -193,12 +193,15 @@ public class MyHostApduService extends HostApduService {
             };
 
             // Build our response
-            byte[] response = new byte[start.length + NDEF_URI_LEN.length + A_OKAY.length];
+            byte[] response = new byte[ NDEF_URI_LEN.length + A_OKAY.length];
 
-            System.arraycopy(start, 0, response, 0, start.length);
-            System.arraycopy(NDEF_URI_LEN, 0, response, start.length, NDEF_URI_LEN.length);
-            System.arraycopy(A_OKAY, 0, response, start.length + NDEF_URI_LEN.length, A_OKAY.length);
-            response = utils.HexStringToByteArray("000F9000");
+//            System.arraycopy(start, 0, response, 0, start.length);
+//            System.arraycopy(NDEF_URI_LEN, 0, response, start.length, NDEF_URI_LEN.length);
+            System.arraycopy(NDEF_URI_LEN, 0, response, 0, NDEF_URI_LEN.length);
+            System.arraycopy(A_OKAY, 0, response,  NDEF_URI_LEN.length, A_OKAY.length);
+//            System.arraycopy(A_OKAY, 0, response, NDEF_URI_LEN.length, A_OKAY.length);
+
+//            response = utils.HexStringToByteArray("000F9000");
             Log.i(TAG, response.toString());
             Log.i(TAG, "NDEF_READ_BINARY_NLEN triggered. Our Response: " + utils.bytesToHex(response));
 
@@ -216,12 +219,16 @@ public class MyHostApduService extends HostApduService {
             };
 
             // Build our response
-            byte[] response = new byte[start.length + NDEF_URI_LEN.length + NDEF_URI_BYTES.length + A_OKAY.length];
+//            byte[] response = new byte[start.length + NDEF_URI_LEN.length + NDEF_URI_BYTES.length + A_OKAY.length];
+            byte[] response = new byte[ NDEF_URI_LEN.length + NDEF_URI_BYTES.length];
 
-            System.arraycopy(start, 0, response, 0, start.length);
-            System.arraycopy(NDEF_URI_LEN, 0, response, start.length, NDEF_URI_LEN.length);
-            System.arraycopy(NDEF_URI_BYTES, 0, response, start.length + NDEF_URI_LEN.length, NDEF_URI_BYTES.length);
-            System.arraycopy(A_OKAY, 0, response, start.length + NDEF_URI_LEN.length + NDEF_URI_BYTES.length, A_OKAY.length);
+//            System.arraycopy(start, 0, response, 0, start.length);
+//            System.arraycopy(NDEF_URI_LEN, 0, response, start.length, NDEF_URI_LEN.length);
+//            System.arraycopy(NDEF_URI_BYTES, 0, response, start.length + NDEF_URI_LEN.length, NDEF_URI_BYTES.length);
+//            System.arraycopy(A_OKAY, 0, response, start.length + NDEF_URI_LEN.length + NDEF_URI_BYTES.length, A_OKAY.length);
+
+            System.arraycopy(NDEF_URI_LEN, 0, response, 0, NDEF_URI_LEN.length);
+            System.arraycopy(NDEF_URI_BYTES, 0, response, NDEF_URI_LEN.length, NDEF_URI_BYTES.length);
 
             Log.i(TAG, NDEF_URI.toString());
             Log.i(TAG, "NDEF_READ_BINARY_GET_NDEF triggered. Our Response: " + utils.bytesToHex(response));
