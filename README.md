@@ -2,7 +2,7 @@
 This is a experimental project about Android NFC functionality. The whole idea is based on using android device as
 a [Host Card Emulation](https://developer.android.com/guide/topics/connectivity/nfc/hce), however we cannot simply send
 a byte array by realising communication enter iOS and Android because of iOS can only accept `NDEF Message`. So I'm enlightened by reading [NFCForum-TS-Type-4-Tag](http://apps4android.org/nfc-specifications/NFCForum-TS-Type-4-Tag_2.0.pdf)
-which simulate the whole process command talking cross devices. You can find more details by reading [this documentation](http://apps4android.org/nfc-specifications/NFCForum-TS-Type-4-Tag_2.0.pdf).
+which simulate the whole process command talking cross devices. You can find more details by reading [this documentation](http://apps4android.org/nfc-specifications/NFCForum-TS-Type-4-Tag_2.0.pdf). You can find iOS Reader Tag Project in [my repo](https://github.com/underwindfall/NFCReaderiOS)
 
 ## Architecture
 The whole project conclude 3 projects modules globally.
