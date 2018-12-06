@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NFCBank</string>
+    <string name="app_name">NFC Card Emulator</string>
     <string name="ad_nfcTurnOn_pos">Turn on</string>
     <string name="ad_nfcTurnOn_neg">Dismiss</string>
     <string name="initial_status_nfc">Waiting for NFC</string>

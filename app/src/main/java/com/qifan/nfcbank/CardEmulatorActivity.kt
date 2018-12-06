@@ -33,6 +33,12 @@ class CardEmulatorActivity : AppCompatActivity() {
         button = findViewById<View>(R.id.button) as Button
         editText = findViewById<View>(R.id.editText) as EditText
         textView = findViewById<View>(R.id.textView) as TextView
+        initNFCFunction()
+
+    }
+
+
+    private fun initNFCFunction() {
         if (checkNFCEnable()) {
             textView.visibility = View.GONE
             editText.visibility = View.VISIBLE
@@ -43,10 +49,7 @@ class CardEmulatorActivity : AppCompatActivity() {
             editText.visibility = View.GONE
             button.visibility = View.GONE
             showTurnOnNfcDialog()
-
         }
-
-
     }
 
     private fun initService() {
@@ -88,6 +91,16 @@ class CardEmulatorActivity : AppCompatActivity() {
             }
             .create()
         mTurnNfcDialog.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mNfcAdapter!!.isEnabled) {
+            textView.visibility = View.GONE
+            editText.visibility = View.VISIBLE
+            button.visibility = View.VISIBLE
+            initService()
+        }
     }
 
 
