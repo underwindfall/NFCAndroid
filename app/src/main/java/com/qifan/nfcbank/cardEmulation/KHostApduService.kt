@@ -1,16 +1,15 @@
 package com.qifan.nfcbank.cardEmulation
 
-import android.nfc.cardemulation.HostApduService
 import android.app.Service
 import android.content.Intent
 import android.nfc.NdefMessage
+import android.nfc.NdefRecord
+import android.nfc.cardemulation.HostApduService
 import android.os.Bundle
 import android.util.Log
-import java.util.*
-import android.nfc.NdefRecord
-import android.widget.Toast
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
+import java.util.*
 
 
 /**
@@ -27,7 +26,13 @@ class KHostApduService : HostApduService() {
         0x04.toByte(), // P1	- Parameter 1 - Instruction parameter 1
         0x00.toByte(), // P2	- Parameter 2 - Instruction parameter 2
         0x07.toByte(), // Lc field	- Number of bytes present in the data field of the command
-        0xD2.toByte(), 0x76.toByte(), 0x00.toByte(), 0x00.toByte(), 0x85.toByte(), 0x01.toByte(), 0x01.toByte(), // NDEF Tag Application name
+        0xD2.toByte(),
+        0x76.toByte(),
+        0x00.toByte(),
+        0x00.toByte(),
+        0x85.toByte(),
+        0x01.toByte(),
+        0x01.toByte(), // NDEF Tag Application name
         0x00.toByte()  // Le field	- Maximum number of bytes expected in the data field of the response to the command
     )
 
@@ -99,21 +104,23 @@ class KHostApduService : HostApduService() {
 
     private val NDEF_ID = byteArrayOf(0xE1.toByte(), 0x04.toByte())
 
-    private var NDEF_URI = NdefMessage(createTextRecord("", "Hello world", NDEF_ID))
+    private var NDEF_URI = NdefMessage(createTextRecord("en", "Ciao, come va?", NDEF_ID))
     private var NDEF_URI_BYTES = NDEF_URI.toByteArray()
-    private var NDEF_URI_LEN = fillByteArrayToFixedDimension(BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2)
-
+    private var NDEF_URI_LEN = fillByteArrayToFixedDimension(
+        BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2
+    )
 
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
         if (intent.hasExtra("ndefMessage")) {
-            NDEF_URI = NdefMessage(createTextRecord("", intent.getStringExtra("ndefMessage"), NDEF_ID))
+            NDEF_URI =
+                NdefMessage(createTextRecord("en", intent.getStringExtra("ndefMessage"), NDEF_ID))
 
             NDEF_URI_BYTES = NDEF_URI.toByteArray()
-            NDEF_URI_LEN = fillByteArrayToFixedDimension(BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2)
-
-            Toast.makeText(applicationContext,"message has been sent",Toast.LENGTH_LONG).show()
+            NDEF_URI_LEN = fillByteArrayToFixedDimension(
+                BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2
+            )
         }
 
         Log.i(TAG, "onStartCommand() | NDEF" + NDEF_URI.toString())
@@ -148,8 +155,15 @@ class KHostApduService : HostApduService() {
         //
         // Third command: ReadBinary data from CC file (Section 5.5.4 in NFC Forum spec)
         //
-        if (Arrays.equals(READ_CAPABILITY_CONTAINER, commandApdu) && !READ_CAPABILITY_CONTAINER_CHECK) {
-            Log.i(TAG, "READ_CAPABILITY_CONTAINER triggered. Our Response: " + READ_CAPABILITY_CONTAINER_RESPONSE.toHex())
+        if (Arrays.equals(
+                READ_CAPABILITY_CONTAINER,
+                commandApdu
+            ) && !READ_CAPABILITY_CONTAINER_CHECK
+        ) {
+            Log.i(
+                TAG,
+                "READ_CAPABILITY_CONTAINER triggered. Our Response: " + READ_CAPABILITY_CONTAINER_RESPONSE.toHex()
+            )
             READ_CAPABILITY_CONTAINER_CHECK = true
             return READ_CAPABILITY_CONTAINER_RESPONSE
         }
@@ -180,12 +194,18 @@ class KHostApduService : HostApduService() {
 
             val fullResponse = ByteArray(NDEF_URI_LEN.size + NDEF_URI_BYTES.size)
             System.arraycopy(NDEF_URI_LEN, 0, fullResponse, 0, NDEF_URI_LEN.size)
-            System.arraycopy(NDEF_URI_BYTES, 0, fullResponse, NDEF_URI_LEN.size, NDEF_URI_BYTES.size)
+            System.arraycopy(
+                NDEF_URI_BYTES,
+                0,
+                fullResponse,
+                NDEF_URI_LEN.size,
+                NDEF_URI_BYTES.size
+            )
 
             Log.i(TAG, "NDEF_READ_BINARY triggered. Full data: " + fullResponse.toHex())
             Log.i(TAG, "READ_BINARY - OFFSET: " + offset + " - LEN: " + length)
 
-            val slicedResponse = fullResponse.sliceArray(offset..fullResponse.size)
+            val slicedResponse = fullResponse.sliceArray(offset until fullResponse.size)
 
             // Build our response
             val realLength = if (slicedResponse.size <= length) slicedResponse.size else length
@@ -212,10 +232,9 @@ class KHostApduService : HostApduService() {
     }
 
 
-
     private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
-    fun ByteArray.toHex() : String{
+    fun ByteArray.toHex(): String {
         val result = StringBuffer()
 
         forEach {
@@ -229,7 +248,7 @@ class KHostApduService : HostApduService() {
         return result.toString()
     }
 
-    fun String.hexStringToByteArray() : ByteArray {
+    fun String.hexStringToByteArray(): ByteArray {
 
         val result = ByteArray(length / 2)
 
@@ -258,12 +277,18 @@ class KHostApduService : HostApduService() {
 
         recordPayload[0] = (languageBytes.size and 0x03F).toByte()
         System.arraycopy(languageBytes, 0, recordPayload, 1, languageBytes.size and 0x03F)
-        System.arraycopy(textBytes, 0, recordPayload, 1 + (languageBytes.size and 0x03F), textBytes.size)
+        System.arraycopy(
+            textBytes,
+            0,
+            recordPayload,
+            1 + (languageBytes.size and 0x03F),
+            textBytes.size
+        )
 
         return NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, id, recordPayload)
     }
 
-    private fun fillByteArrayToFixedDimension(array: ByteArray, fixedSize: Int): ByteArray {
+    fun fillByteArrayToFixedDimension(array: ByteArray, fixedSize: Int): ByteArray {
         if (array.size == fixedSize) {
             return array
         }

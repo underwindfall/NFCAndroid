@@ -1,18 +1,19 @@
 package com.qifan.nfcbank
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Build.VERSION_CODES.JELLY_BEAN
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.qifan.nfcbank.cardEmulation.KHostApduService
 
 /**
@@ -39,7 +40,8 @@ class CardEmulatorActivity : AppCompatActivity() {
 
 
     private fun initNFCFunction() {
-        if (checkNFCEnable()) {
+
+        if (checkNFCEnable() && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
             textView.visibility = View.GONE
             editText.visibility = View.VISIBLE
             button.visibility = View.VISIBLE
@@ -55,7 +57,11 @@ class CardEmulatorActivity : AppCompatActivity() {
     private fun initService() {
         button.setOnClickListener {
             if (TextUtils.isEmpty(editText.text)) {
-                Toast.makeText(this@CardEmulatorActivity, getString(R.string.toast_msg), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@CardEmulatorActivity,
+                    getString(R.string.toast_msg),
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
                 val intent = Intent(this@CardEmulatorActivity, KHostApduService::class.java)
                 intent.putExtra("ndefMessage", editText.text.toString())
