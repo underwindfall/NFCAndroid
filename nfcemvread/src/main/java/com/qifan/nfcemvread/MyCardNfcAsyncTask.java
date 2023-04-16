@@ -6,11 +6,13 @@ import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.io.IOUtils;
 import com.pro100svitlo.creditCardNfcReader.enums.EmvCardScheme;
 import com.pro100svitlo.creditCardNfcReader.model.EmvCard;
 import com.pro100svitlo.creditCardNfcReader.parser.EmvParser;
 import com.pro100svitlo.creditCardNfcReader.utils.Provider;
-import org.apache.commons.io.IOUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

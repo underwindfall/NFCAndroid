@@ -3,8 +3,6 @@ package com.qifan.nfcbank
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
-import android.os.Build
-import android.os.Build.VERSION_CODES.JELLY_BEAN
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -14,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.qifan.nfcbank.cardEmulation.KHostApduService
 
 /**
@@ -35,13 +34,10 @@ class CardEmulatorActivity : AppCompatActivity() {
         editText = findViewById<View>(R.id.editText) as EditText
         textView = findViewById<View>(R.id.textView) as TextView
         initNFCFunction()
-
     }
 
-
     private fun initNFCFunction() {
-
-        if (checkNFCEnable() && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)) {
+        if (supportNfcHceFeature()) {
             textView.visibility = View.GONE
             editText.visibility = View.VISIBLE
             button.visibility = View.VISIBLE
@@ -50,9 +46,15 @@ class CardEmulatorActivity : AppCompatActivity() {
             textView.visibility = View.VISIBLE
             editText.visibility = View.GONE
             button.visibility = View.GONE
-            showTurnOnNfcDialog()
+            // Prevent phone that doesn't support NFC to trigger dialog
+            if (supportNfcHceFeature()) {
+                showTurnOnNfcDialog()
+            }
         }
     }
+
+    private fun supportNfcHceFeature() =
+        checkNFCEnable() && packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION)
 
     private fun initService() {
         button.setOnClickListener {
@@ -60,7 +62,7 @@ class CardEmulatorActivity : AppCompatActivity() {
                 Toast.makeText(
                     this@CardEmulatorActivity,
                     getString(R.string.toast_msg),
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_LONG,
                 ).show()
             } else {
                 val intent = Intent(this@CardEmulatorActivity, KHostApduService::class.java)
@@ -68,7 +70,6 @@ class CardEmulatorActivity : AppCompatActivity() {
                 startService(intent)
             }
         }
-
     }
 
     private fun checkNFCEnable(): Boolean {
@@ -76,24 +77,20 @@ class CardEmulatorActivity : AppCompatActivity() {
             textView.text = getString(R.string.tv_noNfc)
             false
         } else {
-            mNfcAdapter!!.isEnabled
+            mNfcAdapter?.isEnabled == true
         }
     }
 
     private fun showTurnOnNfcDialog() {
-        mTurnNfcDialog = AlertDialog.Builder(this)
+        mTurnNfcDialog = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_rounded)
             .setTitle(getString(R.string.ad_nfcTurnOn_title))
             .setMessage(getString(R.string.ad_nfcTurnOn_message))
             .setPositiveButton(
-                getString(R.string.ad_nfcTurnOn_pos)
+                getString(R.string.ad_nfcTurnOn_pos),
             ) { _, _ ->
-                if (Build.VERSION.SDK_INT >= JELLY_BEAN) {
-                    startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
-                } else {
-                    startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
-                }
+                startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
             }.setNegativeButton(getString(R.string.ad_nfcTurnOn_neg)) { _, _ ->
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             .create()
         mTurnNfcDialog.show()
@@ -101,13 +98,11 @@ class CardEmulatorActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (mNfcAdapter!!.isEnabled) {
+        if (mNfcAdapter?.isEnabled == true) {
             textView.visibility = View.GONE
             editText.visibility = View.VISIBLE
             button.visibility = View.VISIBLE
             initService()
         }
     }
-
-
 }

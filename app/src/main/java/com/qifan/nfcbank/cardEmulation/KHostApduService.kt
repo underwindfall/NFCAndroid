@@ -11,7 +11,6 @@ import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.*
 
-
 /**
  * Created by Qifan on 05/12/2018.
  */
@@ -33,7 +32,7 @@ class KHostApduService : HostApduService() {
         0x85.toByte(),
         0x01.toByte(),
         0x01.toByte(), // NDEF Tag Application name
-        0x00.toByte()  // Le field	- Maximum number of bytes expected in the data field of the response to the command
+        0x00.toByte(), // Le field	- Maximum number of bytes expected in the data field of the response to the command
     )
 
     private val CAPABILITY_CONTAINER_OK = byteArrayOf(
@@ -42,7 +41,8 @@ class KHostApduService : HostApduService() {
         0x00.toByte(), // P1	- Parameter 1 - Instruction parameter 1
         0x0c.toByte(), // P2	- Parameter 2 - Instruction parameter 2
         0x02.toByte(), // Lc field	- Number of bytes present in the data field of the command
-        0xe1.toByte(), 0x03.toByte() // file identifier of the CC file
+        0xe1.toByte(),
+        0x03.toByte(), // file identifier of the CC file
     )
 
     private val READ_CAPABILITY_CONTAINER = byteArrayOf(
@@ -50,7 +50,7 @@ class KHostApduService : HostApduService() {
         0xb0.toByte(), // INS	- Instruction - Instruction code
         0x00.toByte(), // P1	- Parameter 1 - Instruction parameter 1
         0x00.toByte(), // P2	- Parameter 2 - Instruction parameter 2
-        0x0f.toByte()  // Lc field	- Number of bytes present in the data field of the command
+        0x0f.toByte(), // Lc field	- Number of bytes present in the data field of the command
     )
 
     // In the scenario that we have done a CC read, the same byte[] match
@@ -68,7 +68,7 @@ class KHostApduService : HostApduService() {
         0xFF.toByte(), 0xFE.toByte(), // Maximum NDEF file size of 65534 bytes
         0x00.toByte(), // Read access without any security
         0xFF.toByte(), // Write access without any security
-        0x90.toByte(), 0x00.toByte() // A_OKAY
+        0x90.toByte(), 0x00.toByte(), // A_OKAY
     )
 
     private val NDEF_SELECT_OK = byteArrayOf(
@@ -77,29 +77,31 @@ class KHostApduService : HostApduService() {
         0x00.toByte(), // Parameter byte (P1), select by identifier
         0x0c.toByte(), // Parameter byte (P1), select by identifier
         0x02.toByte(), // Lc field	- Number of bytes present in the data field of the command
-        0xE1.toByte(), 0x04.toByte() // file identifier of the NDEF file retrieved from the CC file
+        0xE1.toByte(),
+        0x04.toByte(), // file identifier of the NDEF file retrieved from the CC file
     )
 
     private val NDEF_READ_BINARY = byteArrayOf(
         0x00.toByte(), // Class byte (CLA)
-        0xb0.toByte() // Instruction byte (INS) for ReadBinary command
+        0xb0.toByte(), // Instruction byte (INS) for ReadBinary command
     )
 
     private val NDEF_READ_BINARY_NLEN = byteArrayOf(
         0x00.toByte(), // Class byte (CLA)
         0xb0.toByte(), // Instruction byte (INS) for ReadBinary command
-        0x00.toByte(), 0x00.toByte(), // Parameter byte (P1, P2), offset inside the CC file
-        0x02.toByte()  // Le field
+        0x00.toByte(),
+        0x00.toByte(), // Parameter byte (P1, P2), offset inside the CC file
+        0x02.toByte(), // Le field
     )
 
     private val A_OKAY = byteArrayOf(
         0x90.toByte(), // SW1	Status byte 1 - Command processing status
-        0x00.toByte()   // SW2	Status byte 2 - Command processing qualifier
+        0x00.toByte(), // SW2	Status byte 2 - Command processing qualifier
     )
 
     private val A_ERROR = byteArrayOf(
         0x6A.toByte(), // SW1	Status byte 1 - Command processing status
-        0x82.toByte()   // SW2	Status byte 2 - Command processing qualifier
+        0x82.toByte(), // SW2	Status byte 2 - Command processing qualifier
     )
 
     private val NDEF_ID = byteArrayOf(0xE1.toByte(), 0x04.toByte())
@@ -107,29 +109,28 @@ class KHostApduService : HostApduService() {
     private var NDEF_URI = NdefMessage(createTextRecord("en", "Ciao, come va?", NDEF_ID))
     private var NDEF_URI_BYTES = NDEF_URI.toByteArray()
     private var NDEF_URI_LEN = fillByteArrayToFixedDimension(
-        BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2
+        BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(),
+        2,
     )
 
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
-        if (intent.hasExtra("ndefMessage")) {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.hasExtra("ndefMessage")!!) {
             NDEF_URI =
-                NdefMessage(createTextRecord("en", intent.getStringExtra("ndefMessage"), NDEF_ID))
+                NdefMessage(createTextRecord("en", intent.getStringExtra("ndefMessage")!!, NDEF_ID))
 
             NDEF_URI_BYTES = NDEF_URI.toByteArray()
             NDEF_URI_LEN = fillByteArrayToFixedDimension(
-                BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(), 2
+                BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(),
+                2,
             )
         }
 
-        Log.i(TAG, "onStartCommand() | NDEF" + NDEF_URI.toString())
+        Log.i(TAG, "onStartCommand() | NDEF$NDEF_URI")
 
         return Service.START_STICKY
     }
 
     override fun processCommandApdu(commandApdu: ByteArray, extras: Bundle?): ByteArray {
-
         //
         // The following flow is based on Appendix E "Example of Mapping Version 2.0 Command Flow"
         // in the NFC Forum specification
@@ -139,7 +140,7 @@ class KHostApduService : HostApduService() {
         //
         // First command: NDEF Tag Application select (Section 5.5.2 in NFC Forum spec)
         //
-        if (Arrays.equals(APDU_SELECT, commandApdu)) {
+        if (APDU_SELECT.contentEquals(commandApdu)) {
             Log.i(TAG, "APDU_SELECT triggered. Our Response: " + A_OKAY.toHex())
             return A_OKAY
         }
@@ -147,7 +148,7 @@ class KHostApduService : HostApduService() {
         //
         // Second command: Capability Container select (Section 5.5.3 in NFC Forum spec)
         //
-        if (Arrays.equals(CAPABILITY_CONTAINER_OK, commandApdu)) {
+        if (CAPABILITY_CONTAINER_OK.contentEquals(commandApdu)) {
             Log.i(TAG, "CAPABILITY_CONTAINER_OK triggered. Our Response: " + A_OKAY.toHex())
             return A_OKAY
         }
@@ -155,14 +156,11 @@ class KHostApduService : HostApduService() {
         //
         // Third command: ReadBinary data from CC file (Section 5.5.4 in NFC Forum spec)
         //
-        if (Arrays.equals(
-                READ_CAPABILITY_CONTAINER,
-                commandApdu
-            ) && !READ_CAPABILITY_CONTAINER_CHECK
+        if (READ_CAPABILITY_CONTAINER.contentEquals(commandApdu) && !READ_CAPABILITY_CONTAINER_CHECK
         ) {
             Log.i(
                 TAG,
-                "READ_CAPABILITY_CONTAINER triggered. Our Response: " + READ_CAPABILITY_CONTAINER_RESPONSE.toHex()
+                "READ_CAPABILITY_CONTAINER triggered. Our Response: " + READ_CAPABILITY_CONTAINER_RESPONSE.toHex(),
             )
             READ_CAPABILITY_CONTAINER_CHECK = true
             return READ_CAPABILITY_CONTAINER_RESPONSE
@@ -171,12 +169,12 @@ class KHostApduService : HostApduService() {
         //
         // Fourth command: NDEF Select command (Section 5.5.5 in NFC Forum spec)
         //
-        if (Arrays.equals(NDEF_SELECT_OK, commandApdu)) {
+        if (NDEF_SELECT_OK.contentEquals(commandApdu)) {
             Log.i(TAG, "NDEF_SELECT_OK triggered. Our Response: " + A_OKAY.toHex())
             return A_OKAY
         }
 
-        if (Arrays.equals(NDEF_READ_BINARY_NLEN, commandApdu)) {
+        if (NDEF_READ_BINARY_NLEN.contentEquals(commandApdu)) {
             // Build our response
             val response = ByteArray(NDEF_URI_LEN.size + A_OKAY.size)
             System.arraycopy(NDEF_URI_LEN, 0, response, 0, NDEF_URI_LEN.size)
@@ -188,7 +186,7 @@ class KHostApduService : HostApduService() {
             return response
         }
 
-        if (Arrays.equals(commandApdu.sliceArray(0..1), NDEF_READ_BINARY)) {
+        if (commandApdu.sliceArray(0..1).contentEquals(NDEF_READ_BINARY)) {
             val offset = commandApdu.sliceArray(2..3).toHex().toInt(16)
             val length = commandApdu.sliceArray(4..4).toHex().toInt(16)
 
@@ -199,11 +197,11 @@ class KHostApduService : HostApduService() {
                 0,
                 fullResponse,
                 NDEF_URI_LEN.size,
-                NDEF_URI_BYTES.size
+                NDEF_URI_BYTES.size,
             )
 
             Log.i(TAG, "NDEF_READ_BINARY triggered. Full data: " + fullResponse.toHex())
-            Log.i(TAG, "READ_BINARY - OFFSET: " + offset + " - LEN: " + length)
+            Log.i(TAG, "READ_BINARY - OFFSET: $offset - LEN: $length")
 
             val slicedResponse = fullResponse.sliceArray(offset until fullResponse.size)
 
@@ -231,10 +229,9 @@ class KHostApduService : HostApduService() {
         Log.i(TAG, "onDeactivated() Fired! Reason: $reason")
     }
 
-
     private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
-    fun ByteArray.toHex(): String {
+    private fun ByteArray.toHex(): String {
         val result = StringBuffer()
 
         forEach {
@@ -249,21 +246,20 @@ class KHostApduService : HostApduService() {
     }
 
     fun String.hexStringToByteArray(): ByteArray {
-
         val result = ByteArray(length / 2)
 
-        for (i in 0 until length step 2) {
-            val firstIndex = HEX_CHARS.indexOf(this[i]);
-            val secondIndex = HEX_CHARS.indexOf(this[i + 1]);
+        for (i in indices step 2) {
+            val firstIndex = HEX_CHARS.indexOf(this[i])
+            val secondIndex = HEX_CHARS.indexOf(this[i + 1])
 
             val octet = firstIndex.shl(4).or(secondIndex)
-            result.set(i.shr(1), octet.toByte())
+            result[i.shr(1)] = octet.toByte()
         }
 
         return result
     }
 
-    fun createTextRecord(language: String, text: String, id: ByteArray): NdefRecord {
+    private fun createTextRecord(language: String, text: String, id: ByteArray): NdefRecord {
         val languageBytes: ByteArray
         val textBytes: ByteArray
         try {
@@ -282,13 +278,13 @@ class KHostApduService : HostApduService() {
             0,
             recordPayload,
             1 + (languageBytes.size and 0x03F),
-            textBytes.size
+            textBytes.size,
         )
 
         return NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, id, recordPayload)
     }
 
-    fun fillByteArrayToFixedDimension(array: ByteArray, fixedSize: Int): ByteArray {
+    private fun fillByteArrayToFixedDimension(array: ByteArray, fixedSize: Int): ByteArray {
         if (array.size == fixedSize) {
             return array
         }

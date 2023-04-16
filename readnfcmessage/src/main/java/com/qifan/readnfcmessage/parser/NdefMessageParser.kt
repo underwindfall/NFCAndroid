@@ -3,7 +3,6 @@ package com.qifan.readnfcmessage.parser
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 
-
 /**
  * Created by Qifan on 05/12/2018.
  */
@@ -14,7 +13,7 @@ object NdefMessageParser {
         return getRecords(message.records)
     }
 
-    fun getRecords(records: Array<NdefRecord>): List<ParsedNdefRecord> {
+    private fun getRecords(records: Array<NdefRecord>): List<ParsedNdefRecord> {
         val elements = ArrayList<ParsedNdefRecord>()
 
         for (record in records) {

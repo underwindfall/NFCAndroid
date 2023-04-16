@@ -5,19 +5,18 @@ import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import android.widget.TextView
-import com.pro100svitlo.creditCardNfcReader.utils.CardNfcUtils
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.pro100svitlo.creditCardNfcReader.utils.CardNfcUtils
+import com.qifan.nfcemvread.extensions.TextRecord
 import com.qifan.nfcemvread.extensions.formattedCardNumber
 import com.qifan.nfcemvread.extensions.longShowSnackBar
-import android.widget.LinearLayout
-import com.qifan.nfcemvread.extensions.TextRecord
-
 
 class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface {
 
@@ -50,20 +49,26 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
 
         createProgressbar()
         if (checkNFCEnable()) {
-            mCardNfcUtils = CardNfcUtils(this)
+            if (Build.VERSION.SDK_INT <= 30) {
+                // plugin is deprecated and crashes on android 12> because pending intent isn't set to
+                // PendingIntent.FLAG_IMMUTABLE
+                // e.g PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+                // replace https://github.com/pro100svitlo/Credit-Card-NFC-Reader
+                // with
+                // https://github.com/devnied/EMV-NFC-Paycard-Enrollment
+                mCardNfcUtils = CardNfcUtils(this)
+            }
             mIntentFromCreate = true
             readNFCInfo()
         } else {
             showTurnOnNfcDialog()
         }
-
     }
 
     private fun createProgressbar() {
         mProgressBar = ProgressBar(this)
         mProgressBar.isIndeterminate = true
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -79,14 +84,12 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
 //        mNfcAdapter?.enableForegroundDispatch(this, mPendingIntent, null, null)
     }
 
-
     override fun onPause() {
         super.onPause()
         if (mNfcAdapter != null) {
             mCardNfcUtils?.disableDispatch()
         }
     }
-
 
     private fun readNFCInfo() {
         onNewIntent(intent)
@@ -95,13 +98,11 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        //readNFCTextInfo(intent)
+        // readNFCTextInfo(intent)
         if (mNfcAdapter != null && checkNFCEnable()) {
             mCardNfcAsyncTask = MyCardNfcAsyncTask.Builder(this, intent, mIntentFromCreate).build()
         }
-
     }
-
 
     /**
      * this function is called to parse intent message to normal string
@@ -121,21 +122,16 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
         }
     }
 
-
     private fun showTurnOnNfcDialog() {
         mTurnNfcDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.ad_nfcTurnOn_title))
             .setMessage(getString(R.string.ad_nfcTurnOn_message))
             .setPositiveButton(
-                getString(R.string.ad_nfcTurnOn_pos)
+                getString(R.string.ad_nfcTurnOn_pos),
             ) { _, _ ->
-                if (Build.VERSION.SDK_INT >= 16) {
-                    startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
-                } else {
-                    startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
-                }
+                startActivity(Intent(android.provider.Settings.ACTION_NFC_SETTINGS))
             }.setNegativeButton(getString(R.string.ad_nfcTurnOn_neg)) { _, _ ->
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             .create()
         mTurnNfcDialog.show()
@@ -146,7 +142,7 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
             mNFCStatusTextView.text = getString(R.string.tv_noNfc)
             false
         } else {
-            mNfcAdapter!!.isEnabled
+            mNfcAdapter?.isEnabled == true
         }
     }
 
@@ -154,7 +150,7 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
         when (cardType) {
             MyCardNfcAsyncTask.CARD_UNKNOWN -> longShowSnackBar(
                 mNFCStatusTextView,
-                getString(R.string.snack_unknown_bank_card)
+                getString(R.string.snack_unknown_bank_card),
             )
             MyCardNfcAsyncTask.CARD_VISA -> mCardType.setImageResource(R.drawable.visa_logo)
             MyCardNfcAsyncTask.CARD_MASTER_CARD -> mCardType.setImageResource(R.drawable.master_logo)
@@ -171,14 +167,14 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
         mCardContainer.visibility = View.VISIBLE
         val cardNumber = formattedCardNumber(mCardNfcAsyncTask?.cardNumber)
         val expirationDate = mCardNfcAsyncTask?.cardExpireDate
-        val holderName = mCardNfcAsyncTask?.cardHolderFirstName + mCardNfcAsyncTask?.cardHolderLastName
+        val holderName =
+            mCardNfcAsyncTask?.cardHolderFirstName + mCardNfcAsyncTask?.cardHolderLastName
         val cardType = mCardNfcAsyncTask?.cardType
         mCardNumber.text = cardNumber
         mCardExpirationDate.text = expirationDate
         mCardHolderName.text = holderName
         parseCardType(cardType)
     }
-
 
     override fun finishNfcReadCard() {
         mCardNfcAsyncTask = null
@@ -195,6 +191,4 @@ class MainActivity : AppCompatActivity(), MyCardNfcAsyncTask.MyCardNfcInterface 
     override fun unknownEmvCard() {
         longShowSnackBar(mNFCStatusTextView, getString(R.string.snack_unknownEmv))
     }
-
-
 }
